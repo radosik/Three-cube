@@ -70,7 +70,7 @@ camera.position.x = 250;
 camera.position.y = 250;
 camera.position.z = -250;
 
-camera.lookAt(new THREE.Vector3(0, 0, 0));
+camera.lookAt(new THREE.Vector3(0, -40, 0));
 
 let textureLoader = new THREE.TextureLoader();
 
@@ -82,21 +82,18 @@ let materials = textureUrls
     return new THREE.MeshBasicMaterial({ map: texture });
   });
 
-let mesh = new THREE.Mesh(new THREE.BoxGeometry(200, 200, 200), materials);
-mesh.castShadow = true;
+let geometry = new THREE.BoxGeometry(200, 200, 200);
+
+let mesh = new THREE.Mesh(geometry, materials);
 scene.add(mesh);
 
-var floorGeometry = new THREE.PlaneBufferGeometry(100000, 100000);
-floorMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+var floorGeometry = new THREE.PlaneBufferGeometry(350, 350);
+const shadowTexture = textureLoader.load("t.gif");
+floorMat = new THREE.MeshBasicMaterial({ map: shadowTexture});
 var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
-floorMesh.position.set(0, -150, 0);
-floorMesh.receiveShadow = true;
+floorMesh.position.set(0, -100, 0);
 floorMesh.rotation.x = -Math.PI / 2.0;
 scene.add(floorMesh);
-
-var light = new THREE.PointLight( 0xff0000 );
-light.position.set( 0, 0, 0 );
-scene.add( light );
 
 var side = Math.PI / 2;
 
@@ -104,6 +101,7 @@ function first() {
   if (mesh.rotation.y > 0) {
     requestAnimationFrame(first);
     mesh.rotation.y -= 0.05;
+    floorMesh.rotation.z -= 0.05;
   }
 }
 
@@ -111,6 +109,7 @@ function second() {
   if (mesh.rotation.y < side) {
     requestAnimationFrame(second);
     mesh.rotation.y += 0.05;
+    floorMesh.rotation.z += 0.05;
   }
 }
 
@@ -118,14 +117,21 @@ function third() {
   if (mesh.rotation.y < side * 2) {
     requestAnimationFrame(third);
     mesh.rotation.y += 0.05;
-  } 
+    floorMesh.rotation.z += 0.05;
+  }
+  if (mesh.rotation.y > side * 2) {
+    requestAnimationFrame(third);
+    mesh.rotation.y -= 0.05;
+    floorMesh.rotation.z -= 0.05;
+  }
 }
 
 function fourth() {
   if (mesh.rotation.y < side * 3) {
     requestAnimationFrame(fourth);
     mesh.rotation.y += 0.05;
-  } 
+    floorMesh.rotation.z += 0.05;
+  }
 }
 
 function init() {
