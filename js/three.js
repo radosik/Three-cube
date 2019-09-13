@@ -111,6 +111,11 @@ function second() {
     mesh.rotation.y += 0.05;
     floorMesh.rotation.z += 0.05;
   }
+  if (mesh.rotation.y > side + 0.05) {
+    requestAnimationFrame(second);
+    mesh.rotation.y -= 0.05;
+    floorMesh.rotation.z -= 0.05;
+  }
 }
 
 function third() {
@@ -119,7 +124,7 @@ function third() {
     mesh.rotation.y += 0.05;
     floorMesh.rotation.z += 0.05;
   }
-  if (mesh.rotation.y > side * 2) {
+  if (mesh.rotation.y > side * 2 + 0.05) {
     requestAnimationFrame(third);
     mesh.rotation.y -= 0.05;
     floorMesh.rotation.z -= 0.05;
