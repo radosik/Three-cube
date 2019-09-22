@@ -54,21 +54,25 @@ let textureUrls = [
   "texture2.gif"
 ];
 
+let cont = document.getElementById("container");
 let renderer = null;
 let camera = null;
 let scene = null;
 
-scene = new THREE.Scene();
-camera = new THREE.PerspectiveCamera(
-  50,
-  window.innerWidth / window.innerHeight,
-  1,
-  100000
-);
+let diumX = 20;
+let diumY = 20;
+let diumZ = 20;
 
-camera.position.x = 250;
-camera.position.y = 250;
-camera.position.z = -250;
+let cubeX = diumX * 10;
+let cubeY = diumY * 10;
+let cubeZ = diumZ * 10;
+
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera(50, 1, 1, 100000);
+
+camera.position.x = cubeX * 1.7;
+camera.position.y = cubeY;
+camera.position.z = -cubeZ;
 
 camera.lookAt(new THREE.Vector3(0, -40, 0));
 
@@ -82,16 +86,16 @@ let materials = textureUrls
     return new THREE.MeshBasicMaterial({ map: texture });
   });
 
-let geometry = new THREE.BoxGeometry(200, 200, 200);
+let geometry = new THREE.BoxGeometry(cubeZ, cubeX, cubeY);
 
 let mesh = new THREE.Mesh(geometry, materials);
 scene.add(mesh);
 
-var floorGeometry = new THREE.PlaneBufferGeometry(350, 350);
+var floorGeometry = new THREE.PlaneBufferGeometry(cubeZ * 1.7, cubeY * 1.7);
 const shadowTexture = textureLoader.load("t.gif");
-floorMat = new THREE.MeshBasicMaterial({ map: shadowTexture});
+floorMat = new THREE.MeshBasicMaterial({ map: shadowTexture });
 var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
-floorMesh.position.set(0, -100, 0);
+floorMesh.position.set(0, -cubeX / 2, 0);
 floorMesh.rotation.x = -Math.PI / 2.0;
 scene.add(floorMesh);
 
@@ -139,11 +143,49 @@ function fourth() {
   }
 }
 
+let arr = [];
+
+function f() {
+  if (mesh.rotation.y < side * 3) {
+    requestAnimationFrame(f);
+    mesh.rotation.y += 0.2;
+    floorMesh.rotation.z += 0.2;
+  }
+  dataURL = ctx.toDataURL("image/png");
+  arr.push(dataURL);
+}
+
+function record() {
+  f();
+  function gf() {
+    gifshot.createGIF(
+      {
+        gifWidth: 800,
+        gifHeight: 800,
+        images: arr,
+        numFrames: 10,
+        frameDuration: 1,
+        sampleInterval: 10,
+        numWorkers: 10
+      },
+      function(obj) {
+        if (!obj.error) {
+          var image = obj.image,
+            animatedImage = document.getElementById("imgSample");
+          animatedImage.src = image;
+          document.body.appendChild(animatedImage);
+        }
+      }
+    );
+  }
+  setTimeout(gf, 1000);
+}
 function init() {
-  renderer = new THREE.WebGLRenderer();
+  renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
   scene.background = new THREE.Color(0xffffff);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  renderer.setSize(cont.clientWidth, cont.clientHeight);
+  renderer.domElement.id = "canvas";
+  cont.appendChild(renderer.domElement);
   render();
 }
 
@@ -153,3 +195,5 @@ function render() {
 }
 
 init();
+
+let ctx = document.getElementById("canvas");
